@@ -1,20 +1,21 @@
 from app import app, mysql
 from flask import jsonify, request
 import uuid
+from .sql_queries import sql_queries
 
+# @app.route('/api/data', methods=['GET'])
+# def get_data():
+#     # 处理获取数据的逻辑，例如从数据库中获取数据
+#     data = {'message': 'Hello from Flask!'}
+#     return jsonify(data)
 
-@app.route('/api/data', methods=['GET'])
-def get_data():
-    # 处理获取数据的逻辑，例如从数据库中获取数据
-    data = {'message': 'Hello from Flask!'}
-    return jsonify(data)
+# @app.route('/api/send_data', methods=['POST'])
+# def send_data():
+#     # 处理接收前端发送的数据并进行相应操作的逻辑
+#     request_data = request.get_json()
+#     # 处理接收到的数据
+#     return jsonify({'message': 'Data received successfully!'})
 
-@app.route('/api/send_data', methods=['POST'])
-def send_data():
-    # 处理接收前端发送的数据并进行相应操作的逻辑
-    request_data = request.get_json()
-    # 处理接收到的数据
-    return jsonify({'message': 'Data received successfully!'})
 
 @app.route('/api/register', methods=['POST'])
 def register():
@@ -25,13 +26,14 @@ def register():
         
         cur = mysql.cursor()
         # check repeat email
-        cur.execute("SELECT * FROM user_data WHERE email = %s", (data['email'],))
+        cur.execute(sql_queries['check_repeat_email'], (data['email'],))
         existing_user = cur.fetchone()
         if existing_user:
             cur.close()
             return jsonify({'message': 'Register Failed: Email address already exists.'}), 400
         else:
-            cur.execute("INSERT INTO user_data (uuid, username, email, password) VALUES (%s, %s, %s, %s);",
+            #insert new account
+            cur.execute(sql_queries['insert_new_account'],
                         (random_uuid, data['username'], data['email'], data['password']))
             cur.close()
             print("Received register data from frontend:", data)
@@ -47,7 +49,7 @@ def login():
         
         cur = mysql.cursor()
         # check email and password
-        cur.execute("SELECT * FROM user_data WHERE email = %s AND password = %s", (data['email'], data['password']))
+        cur.execute(sql_queries['check_email_and_password'], (data['email'], data['password']))
         existing_user = cur.fetchone()
         cur.close()
         if not existing_user:
