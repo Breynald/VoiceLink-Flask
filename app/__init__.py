@@ -1,11 +1,16 @@
 from flask import Flask
+from flask_session import Session
 from flask_cors import CORS
-from .mysqlconfig import Config
+from .appconfig import Config
 import pymysql
+# import os
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+Session(app)
 CORS(app)
+
 
 mysql = pymysql.connect(
     host=app.config['MYSQL_HOST'],
@@ -14,7 +19,3 @@ mysql = pymysql.connect(
     db=app.config['MYSQL_DB'],
     autocommit=True
 )
-
-
-# other config...
-# app.config['SECRET_KEY'] = 'voicelinkflask'

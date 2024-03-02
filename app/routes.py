@@ -1,20 +1,7 @@
 from app import app, mysql
-from flask import jsonify, request
+from flask import jsonify, request, session
 import uuid
 from .sql_queries import sql_queries
-
-# @app.route('/api/data', methods=['GET'])
-# def get_data():
-#     # 处理获取数据的逻辑，例如从数据库中获取数据
-#     data = {'message': 'Hello from Flask!'}
-#     return jsonify(data)
-
-# @app.route('/api/send_data', methods=['POST'])
-# def send_data():
-#     # 处理接收前端发送的数据并进行相应操作的逻辑
-#     request_data = request.get_json()
-#     # 处理接收到的数据
-#     return jsonify({'message': 'Data received successfully!'})
 
 
 @app.route('/api/register', methods=['POST'])
@@ -50,12 +37,17 @@ def login():
         cur = mysql.cursor()
         # check email and password
         cur.execute(sql_queries['check_email_and_password'], (data['email'], data['password']))
-        existing_user = cur.fetchone()
+        existing_uuid = cur.fetchone()
         cur.close()
-        if not existing_user:
+        if not existing_uuid:
             return jsonify({'message': 'Login Failed: User not exist.'}), 400
         else:
-            print("Received login data from frontend:", data)
-            return jsonify({'message': 'Login successfully'})
+            session['uuid'] = existing_uuid;
+            print(existing_uuid[0])
+            # print("Received login data from frontend:", data)
+            return jsonify({
+                'message': 'Login successfully',
+                'sessionId': session.sid
+            }), 200
 
 

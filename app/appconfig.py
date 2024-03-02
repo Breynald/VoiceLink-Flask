@@ -4,3 +4,6 @@ class Config:
     MYSQL_USER = 'breynald'
     MYSQL_PASSWORD = 'Qwerdf1314...'
     MYSQL_DB = 'VoiceLink'
+
+    #others
+    SESSION_TYPE = 'filesystem'
