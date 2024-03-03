@@ -42,7 +42,9 @@ def login():
         if not existing_uuid:
             return jsonify({'message': 'Login Failed: User not exist.'}), 400
         else:
-            session['uuid'] = existing_uuid;
+            session['uuid'] = existing_uuid[0];
+            session.permanent = True
+            app.permanent_session_lifetime = 604800 #7 days
             print(existing_uuid[0])
             # print("Received login data from frontend:", data)
             return jsonify({
@@ -50,4 +52,24 @@ def login():
                 'sessionId': session.sid
             }), 200
 
+    
+
+@app.route('/api/autologin', methods=['POST'])
+def autologin():
+    if request.method == 'POST':
+        # receive data from frontend
+        session_data = request.json
+        
+        if 'uuid' not in session_data:
+            return jsonify({'message': 'Auto Login Failed: No session.'}), 400
+        elif session.get('uuid') != session_data['uuid']:
+            return jsonify({'message': 'Auto Login Failed: Invalid session.'}), 400
+        else:
+            session.update(session_data)
+            session.permanent = True
+            app.permanent_session_lifetime = 604800 #7 days
+            # print("Received login data from frontend:", data)
+            return jsonify({
+                'message': 'Auto Login successfully'
+            }), 200
 
