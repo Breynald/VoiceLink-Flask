@@ -1,3 +1,4 @@
+from datetime import timedelta
 from app import app, mysql
 from flask import jsonify, request, session
 import uuid
@@ -40,16 +41,17 @@ def login():
         existing_uuid = cur.fetchone()
         cur.close()
         if not existing_uuid:
-            return jsonify({'message': 'Login Failed: User not exist.'}), 400
+            return jsonify({'message': 'Login Failed: User not exist or password incorrect.'}), 400
         else:
-            session['uuid'] = existing_uuid[0];
+            session['uuid'] = str(existing_uuid[0]);
             session.permanent = True
-            app.permanent_session_lifetime = 604800 #7 days
-            print(existing_uuid[0])
+            app.permanent_session_lifetime = timedelta(days=7)
+            print(session)
             # print("Received login data from frontend:", data)
+            print(session['uuid'])
             return jsonify({
                 'message': 'Login successfully',
-                'sessionId': session.sid
+                'sessionuuid': session['uuid']
             }), 200
 
     
@@ -58,17 +60,16 @@ def login():
 def autologin():
     if request.method == 'POST':
         # receive data from frontend
-        session_data = request.json
+        session_id = request.json['sessionId']
         
-        if 'uuid' not in session_data:
+        if not session_id:
             return jsonify({'message': 'Auto Login Failed: No session.'}), 400
-        elif session.get('uuid') != session_data['uuid']:
+        elif session.sid != session_id:
             return jsonify({'message': 'Auto Login Failed: Invalid session.'}), 400
         else:
-            session.update(session_data)
+            session.update(session_id)
             session.permanent = True
-            app.permanent_session_lifetime = 604800 #7 days
-            # print("Received login data from frontend:", data)
+            app.permanent_session_lifetime = timedelta(days=7)
             return jsonify({
                 'message': 'Auto Login successfully'
             }), 200

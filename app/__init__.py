@@ -8,6 +8,7 @@ import pymysql
 app = Flask(__name__)
 app.config.from_object(Config)
 
+
 Session(app)
 CORS(app)
 
