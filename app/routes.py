@@ -1,6 +1,7 @@
 from datetime import timedelta
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from app import app, mysql
-from flask import jsonify, request, session
+from flask import jsonify, request
 import uuid
 from .sql_queries import sql_queries
 
@@ -43,34 +44,17 @@ def login():
         if not existing_uuid:
             return jsonify({'message': 'Login Failed: User not exist or password incorrect.'}), 400
         else:
-            session['uuid'] = str(existing_uuid[0]);
-            session.permanent = True
-            app.permanent_session_lifetime = timedelta(days=7)
-            print(session)
+            access_token = create_access_token(identity=existing_uuid)
             # print("Received login data from frontend:", data)
-            print(session['uuid'])
             return jsonify({
                 'message': 'Login successfully',
-                'sessionuuid': session['uuid']
+                'access_token': access_token
             }), 200
 
-    
-
+# 受保护端点
 @app.route('/api/autologin', methods=['POST'])
+@jwt_required()  # 这个装饰器要求访问该端点时需要验证 JWT token
 def autologin():
-    if request.method == 'POST':
-        # receive data from frontend
-        session_id = request.json['sessionId']
-        
-        if not session_id:
-            return jsonify({'message': 'Auto Login Failed: No session.'}), 400
-        elif session.sid != session_id:
-            return jsonify({'message': 'Auto Login Failed: Invalid session.'}), 400
-        else:
-            session.update(session_id)
-            session.permanent = True
-            app.permanent_session_lifetime = timedelta(days=7)
-            return jsonify({
-                'message': 'Auto Login successfully'
-            }), 200
+    current_user = get_jwt_identity()  # 获取当前用户的身份信息
+    return jsonify(logged_in_as=current_user), 200
 

@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 class Config:
     # MySQL数据库配置
     MYSQL_HOST = 'breynald.space'
@@ -6,4 +8,6 @@ class Config:
     MYSQL_DB = 'VoiceLink'
 
     #others
-    SESSION_TYPE = 'filesystem'
+    SECRET_KEY = 'breynald'
+    JWT_SECRET_KEY = 'breynald'
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=30)
