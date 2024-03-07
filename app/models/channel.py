@@ -1,11 +1,16 @@
 
 class Channel:
-    def __init__(self, channelid, channelname, channelpassword, maxplayer):
+    def __init__(self, serverid, channelid, channelname, channelpassword, maxplayer:int, currentcount:int, ):
+        self.__serverid = serverid
         self.__channelid = channelid
         self.__channelname = channelname
         self.__channelpassword = channelpassword
-        self.__maxplayer = maxplayer
+        self.__maxplayer = maxplayer if maxplayer>0 else 0
+            
     
+    def getServerid(self):
+        return self.__serverid
+
     def getChannelid(self):
         return self.__channelid
     
@@ -18,6 +23,9 @@ class Channel:
     def getMaxplayer(self):
         return self.__maxplayer
     
+    def setServerid(self, serverid):
+        self.__serverid = serverid
+
     def setChannelid(self, channelid):
         self.__channelid = channelid
 
@@ -27,6 +35,6 @@ class Channel:
     def setChannelpassword(self, channelpassword):
         self.__channelpassword = channelpassword
     
-    def setMaxplayer(self, maxplayer):
+    def setMaxplayer(self, maxplayer:int):
         self.__maxplayer = maxplayer
         

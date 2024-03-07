@@ -1,11 +1,11 @@
-from channel import Channel
 
 class Server:
-    def __init__(self, serverid, servername, serverpassword, channellist=None):
+    def __init__(self, serverid, servername, serverpassword, serverip, serverport):
         self.__serverid = serverid
         self.__servername = servername
         self.__serverpassword = serverpassword
-        self.__channellist = channellist if channellist is not None else []
+        self.__serverip = serverip
+        self.__serverport = serverport
 
     def getServerid(self):
         return self.__serverid
@@ -16,8 +16,11 @@ class Server:
     def getServerpassword(self):
         return self.__serverpassword
     
-    def getChannellist(self):
-        return self.__channellist
+    def getServerip(self):
+        return self.__serverip
+    
+    def getServerport(self):
+        return self.__serverport
     
     def setServerid(self, serverid):
         self.__serverid = serverid
@@ -28,11 +31,9 @@ class Server:
     def setServerpassword(self, serverpassword):
         self.__serverpassword = serverpassword
 
-    def addChannel(self, channel:Channel):
-        self.__channellist.append(channel)
+    def setServerip(self, serverip):
+        self.__serverip = serverip
 
-    def delChannel(self, channelid):
-        for channel in self.__channellist:
-            if channel.getChannelid() == channelid:
-                self.__channellist.remove(channel)
+    def setServerport(self, serverport):
+        self.setServerport = serverport
 

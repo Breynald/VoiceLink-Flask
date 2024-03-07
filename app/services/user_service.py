@@ -11,17 +11,18 @@ class UserService:
         if self.__user_dao.checkRepeatemail(email):
             return {'message': 'Register Failed: Email address already exists.'}, 400
         
-        random_uuid = str(uuid.uuid4())
-        self.__user_dao.insertNewaccount(random_uuid, username, email, password)
+        userid = str(uuid.uuid4())
+        self.__user_dao.insertNewaccount(userid, username, email, password)
         return {'message': 'Register successfully'}, 200
     
     def login(self, email, password):
-        user_uuid = self.__user_dao.checkEmailandPassword(email, password)
-        if not user_uuid:
+        userid = self.__user_dao.checkEmailandPassword(email, password)
+        if not userid:
             return {'message': 'Login Failed: The email address or password is incorrect.'}, 400
         
-        access_token = create_access_token(identity=user_uuid)
+        access_token = create_access_token(identity=userid)
         return {
             'message': 'Login successfully',
-            'access_token': access_token
+            'access_token': access_token,
+            'userid': userid
         }, 200

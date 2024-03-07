@@ -6,7 +6,9 @@ from .appconfig import Config
 
 # dao and service
 from .dal.user_dao import UserDAO
+from .dal.server_dao import ServerDAO
 from .services.user_service import UserService
+from .services.server_service import ServerService
 
 
 app = Flask(__name__)
@@ -23,5 +25,7 @@ mysql = pymysql.connect(
 )
 
 user_dao = UserDAO(db=mysql)
+server_dao = ServerDAO(db=mysql)
 user_service = UserService(user_dao)
+server_service = ServerService(server_dao)
 
