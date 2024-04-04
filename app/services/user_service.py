@@ -1,4 +1,3 @@
-# from dal.user_dao import UserDAO
 from ..dal.user_dao import UserDAO
 from flask_jwt_extended import create_access_token
 import uuid
@@ -12,8 +11,12 @@ class UserService:
             return {'message': 'Register Failed: Email address already exists.'}, 400
         
         userid = str(uuid.uuid4())
-        self.__user_dao.insertNewaccount(userid, username, email, password)
-        return {'message': 'Register successfully'}, 200
+        if self.__user_dao.insertNewaccount(userid, username, email, password):
+            return {'message': 'Register successfully.'}, 200
+        else:
+            return {'message': 'Register Failed.'}, 400
+
+        
     
     def login(self, email, password):
         userid = self.__user_dao.checkEmailandPassword(email, password)
@@ -22,7 +25,18 @@ class UserService:
         
         access_token = create_access_token(identity=userid)
         return {
-            'message': 'Login successfully',
+            'message': 'Login successfully.',
             'access_token': access_token,
-            'userid': userid
+            'userid': userid[0]
+        }, 200
+        
+
+    def getUsername(self, userid):
+        username = self.__user_dao.getUsername(userid)
+        if not username:
+            return {'message': 'Get Username Failed.'}, 400
+        
+        return {
+            'message': 'Get Username Successfully.',
+            'username': username[0]
         }, 200

@@ -1,27 +1,63 @@
 
 class UserDAO:
-    def __init__(self, db):
-        self.__db = db
+    def __init__(self, pool):
+        self.__pool = pool
     
     def checkRepeatemail(self, email):
-        cur = self.__db.cursor()
-        cur.execute('SELECT * FROM user_data WHERE email = %s;', (email, ))
-        data = cur.fetchone()
-        cur.close()
-        return data
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT * FROM user_data WHERE email = %s;', (email, ))
+                return cur.fetchone()
+        except Exception as e:
+                print(f"An error occurred: {e}")
+                return None
+        finally:
+            conn.close() 
     
     def insertNewaccount(self, userid, username, email, password):
-        cur = self.__db.cursor()
-        cur.execute('INSERT INTO user_data (userid, username, email, password) VALUES (%s, %s, %s, %s);',
-                    (userid, username, email, password))
-        cur.close()
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('INSERT INTO user_data (userid, username, email, password) VALUES (%s, %s, %s, %s);',
+                            (userid, username, email, password))
+                return True
+        except Exception as e:
+                print(f"An error occurred: {e}")
+                conn.rollback()
+                return False
+        finally:
+            conn.close() 
+
+
 
     def checkEmailandPassword(self, email, password):
-        cur = self.__db.cursor()
-        cur.execute('SELECT userid FROM user_data WHERE email = %s AND password = %s;', 
-                    (email, password))
-        data = cur.fetchone()
-        cur.close()
-        return data
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT userid FROM user_data WHERE email = %s AND password = %s;', 
+                            (email, password))
+                return cur.fetchone()
+        except Exception as e:
+                print(f"An error occurred: {e}")
+                return None
+        finally:
+            conn.close() 
+
+
+    def getUsername(self, userid):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT username FROM user_data WHERE userid = %s;', 
+                            (userid,))
+                return cur.fetchone()
+        except Exception as e:
+                print(f"An error occurred: {e}")
+                return None
+        finally:
+            conn.close()
+    
+
 
         

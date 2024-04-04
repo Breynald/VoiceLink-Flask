@@ -15,13 +15,13 @@ def login():
     response, status_code = user_service.login(data['email'], data['password'])
     return response, status_code
 
-@app.route('api/createserver', method=['POST'])
+@app.route('/api/createserver', methods=['POST'])
 def createserver():
     data = request.json
     response, status_code = server_service.createServer(data['servername'], data['serverpassword'], data['serverip'], data['serverport'])
     return response, status_code
 
-@app.route('/api/joinserver', method=['POST'])
+@app.route('/api/joinserver', methods=['POST'])
 def joinserver():
     data = request.json
     response, status_code = server_service.joinServer(data['userid'], data['serverid'], data['serverpassword'])
@@ -33,3 +33,26 @@ def autologin():
     current_user = get_jwt_identity()  # 获取当前用户的身份信息
     return jsonify(logged_in_as=current_user), 200
 
+@app.route('/api/getserverlist', methods=['POST'])
+def getserverlist():
+    data = request.json
+    response, status_code = server_service.getServerlist(data['userid'])
+    return response, status_code
+
+@app.route('/api/getserver', methods=['POST'])
+def getserver():
+    data = request.json
+    response, status_code = server_service.getServer(data['serverid'])
+    return response, status_code
+
+@app.route('/api/getchannellist', methods=['POST'])
+def getchannellist():
+    data = request.json
+    response, status_code = server_service.getChannellist(data['serverid'])
+    return response, status_code
+
+@app.route('/api/getusername', methods=['POST'])
+def getusername():
+    data = request.json
+    response, status_code = user_service.getUsername(data['userid'])
+    return response, status_code
