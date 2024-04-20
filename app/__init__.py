@@ -6,6 +6,8 @@ from dbutils.pooled_db import PooledDB
 from .appconfig import Config
 import time
 import threading
+from flask_socketio import SocketIO
+
 
 # dao and service
 from .dal.user_dao import UserDAO
@@ -18,6 +20,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
+socketio = SocketIO(app, cors_allowed_origins='*')
 
 pool = PooledDB(
     creator=pymysql,

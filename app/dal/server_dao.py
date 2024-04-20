@@ -90,10 +90,62 @@ class ServerDAO:
         try:
             conn = self.__pool.connection()
             with conn.cursor() as cur:
-                cur.execute('SELECT * FROM channel_data WHERE serverid=%s;', (serverid, ))
+                cur.execute('SELECT * FROM channel_data WHERE serverid=%s ORDER BY channelid ASC;', (serverid, ))
                 return cur.fetchall()
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
         finally:
             conn.close() 
+
+    def getChanneluserscount(self, serverid, channelid):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT currentplayer FROM channel_data WHERE serverid=%s AND channelid=%s;', (serverid, channelid))
+                return cur.fetchone()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+        finally:
+            conn.close() 
+
+    def setChanneluserscount(self, serverid, channelid, count):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('UPDATE channel_data SET currentplayer=%s WHERE serverid=%s AND channelid=%s;', (count, serverid, channelid))
+                return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return False
+        finally:
+            conn.close() 
+
+
+    def insertNewchannel(self, serverid, channelname, channelpassword, maxplayer):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('INSERT INTO channel_data (serverid, channelname, channelpassword, maxplayer, currentplayer) VALUES (%s, %s, %s, %s, %s);',
+                            (serverid, channelname, channelpassword, maxplayer, 0))
+            return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            conn.rollback()
+            return False
+        finally:
+            conn.close() 
+
+    def delChannel(self, serverid, channelid):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('DELETE FROM channel_data WHERE serverid=%s AND channelid=%s;', (serverid, channelid))
+                return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return False
+        finally:
+            conn.close() 
+        

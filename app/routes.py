@@ -1,6 +1,7 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import app, user_service, server_service
+from app import app, socketio, user_service, server_service
 from flask import jsonify, request
+from flask_socketio import emit
 
 
 @app.route('/api/register', methods=['POST'])
@@ -51,8 +52,51 @@ def getchannellist():
     response, status_code = server_service.getChannellist(data['serverid'])
     return response, status_code
 
-@app.route('/api/getusername', methods=['POST'])
-def getusername():
+@app.route('/api/getuser', methods=['POST'])
+def getuser():
     data = request.json
-    response, status_code = user_service.getUsername(data['userid'])
+    response, status_code = user_service.getUser(data['userid'])
     return response, status_code
+
+@app.route('/api/setusername', methods=['POST'])
+def setusername():
+    data = request.json
+    response, status_code = user_service.setUsername(data['userid'], data['username'])
+    return response, status_code
+
+@app.route('/api/addchannel', methods=['POST'])
+def addchannel():
+    data = request.json
+    response, status_code = server_service.addChannel(data['serverid'], data['channelname'], data['channelpassword'], data['maxplayer'])
+    return response, status_code
+
+@app.route('/api/delchannel', methods=['POST'])
+def delchannel():
+    data = request.json
+    response, status_code = server_service.delChannel(data['serverid'], data['channelid'])
+    return response, status_code
+
+
+@socketio.on('joinchannel')
+def joinchannel(data):
+    serverid = data['serverid']
+    channelid = data['channelid']
+    
+    current_user_count = server_service.getChanneluserscount(serverid, channelid)
+
+    server_service.setChanneluserscount(serverid, channelid, current_user_count+1)
+
+    emit('channel_users_count', {'serverid': serverid, 'channelid': channelid, 'count': current_user_count + 1}, broadcast=True)
+
+
+@socketio.on('leavechannel')
+def leavechannel(data):
+    serverid = data['serverid']
+    channelid = data['channelid']
+    
+    current_user_count = server_service.getChanneluserscount(serverid, channelid)
+
+    server_service.setChanneluserscount(serverid, channelid, current_user_count-1)
+
+    emit('channel_users_count', {'serverid': serverid, 'channelid': channelid, 'count': current_user_count - 1}, broadcast=True)
+

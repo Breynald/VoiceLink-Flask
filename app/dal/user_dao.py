@@ -45,11 +45,11 @@ class UserDAO:
             conn.close() 
 
 
-    def getUsername(self, userid):
+    def getUser(self, userid):
         try:
             conn = self.__pool.connection()
             with conn.cursor() as cur:
-                cur.execute('SELECT username FROM user_data WHERE userid = %s;', 
+                cur.execute('SELECT * FROM user_data WHERE userid = %s;', 
                             (userid,))
                 return cur.fetchone()
         except Exception as e:
@@ -57,6 +57,31 @@ class UserDAO:
                 return None
         finally:
             conn.close()
+
+    def setUsername(self, userid, username):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('UPDATE user_data SET username=%s WHERE userid=%s;',
+                            (username, userid))
+                return True
+        except Exception as e:
+                print(f"An error occurred: {e}")
+                conn.rollback()
+                return False
+        finally:
+            conn.close() 
+
+
+
+
+
+
+
+
+
+
+
     
 
 

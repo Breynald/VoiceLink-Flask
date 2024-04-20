@@ -72,11 +72,11 @@ class ServerService:
             channellist = []
             for data in datas:
                 channellist.append({
-                    'channelindex': data[2],
-                    'channelname': data[3],
-                    'channelpassword': data[4],
-                    'maxplayer': data[5],
-                    'currentplayer': data[6]
+                    'channelid': data[0],
+                    'channelname': data[2],
+                    'channelpassword': data[3],
+                    'maxplayer': data[4],
+                    'currentplayer': data[5]
                 })
             return {
                 'message': 'Get channel list successfully.',
@@ -87,3 +87,30 @@ class ServerService:
                 'message': 'Get no channel.',
                 'channellist': None
             }, 404
+
+
+    def getChanneluserscount(self, serverid, channelid):
+        data = self.__server_dao.getChanneluserscount(serverid, channelid)
+        if data is not None:
+            return data[0]
+        else:
+            return -1
+
+    def setChanneluserscount(self, serverid, channelid, count):
+        if self.__server_dao.setChanneluserscount(serverid, channelid, count):
+            return True
+        else:
+            return False
+        
+    def addChannel(self, serverid, channelname, channelpassword, maxplayer):
+        if self.__server_dao.insertNewchannel(serverid, channelname, channelpassword, maxplayer):
+            return {'message': 'Add channel successfully.'}, 200
+        else:
+            return {'message': 'Add channel failed, try again later.'}, 400
+
+    def delChannel(self, serverid, channelid):
+        if self.__server_dao.delChannel(serverid, channelid):
+            return {'message': 'Del channel successfully.'}, 200
+        else:
+            return {'message': 'Del channel failed, try again later.'}, 400
+        
