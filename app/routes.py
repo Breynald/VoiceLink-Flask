@@ -19,7 +19,7 @@ def login():
 @app.route('/api/createserver', methods=['POST'])
 def createserver():
     data = request.json
-    response, status_code = server_service.createServer(data['servername'], data['serverpassword'], data['serverip'], data['serverport'])
+    response, status_code = server_service.createServer(data['servername'], data['serverpassword'], data['serverip'], data['serverport'], data['avatarname'], data['userid'])
     return response, status_code
 
 @app.route('/api/joinserver', methods=['POST'])
@@ -75,6 +75,14 @@ def delchannel():
     data = request.json
     response, status_code = server_service.delChannel(data['serverid'], data['channelid'])
     return response, status_code
+
+@app.route('/api/saveavatar', methods=['POST'])
+def saveavatar():
+    file_obj = request.files.get('file')
+    file_name = request.form.get('filename')
+    response, status_code = server_service.saveAvatar(file_obj, file_name)
+    return response, status_code
+
 
 
 @socketio.on('joinchannel')

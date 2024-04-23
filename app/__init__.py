@@ -7,7 +7,7 @@ from .appconfig import Config
 import time
 import threading
 from flask_socketio import SocketIO
-
+import os
 
 # dao and service
 from .dal.user_dao import UserDAO
@@ -18,6 +18,7 @@ from .services.server_service import ServerService
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.static_folder = '../static'
 jwt = JWTManager(app)
 CORS(app, supports_credentials=True)
 socketio = SocketIO(app, cors_allowed_origins='*')
@@ -37,8 +38,6 @@ pool = PooledDB(
     database=app.config['MYSQL_DB'],
     autocommit=True
 )
-
-
 
 
 user_dao = UserDAO(pool)

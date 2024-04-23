@@ -3,12 +3,12 @@ class ServerDAO:
     def __init__(self, pool):
         self.__pool = pool
 
-    def insertNewserver(self, serverid, servername, serverpassword, serverip, serverport):
+    def insertNewserver(self, serverid, servername, serverpassword, serverip, serverport, avatarutl):
         try:
             conn = self.__pool.connection()
             with conn.cursor() as cur:
-                cur.execute('INSERT INTO server_data (serverid, servername, serverpassword, serverip, serverport) VALUES (%s, %s, %s, %s, %s);',
-                            (serverid, servername, serverpassword, serverip, serverport))
+                cur.execute('INSERT INTO server_data (serverid, servername, serverpassword, serverip, serverport, avatarurl) VALUES (%s, %s, %s, %s, %s, %s);',
+                            (serverid, servername, serverpassword, serverip, serverport, avatarutl))
             return True
         except Exception as e:
             print(f"An error occurred: {e}")
@@ -24,7 +24,7 @@ class ServerDAO:
             with conn.cursor() as cur:
                 cur.execute('SELECT serverpassword FROM server_data WHERE serverid=%s;', (serverid,))
                 data = cur.fetchone()
-                if data and (data[0] is None or data[0] == ""):
+                if data[0] is None:
                     return True
         except Exception as e:
             print(f"An error occurred: {e}")

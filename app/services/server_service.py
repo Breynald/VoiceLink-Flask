@@ -5,9 +5,11 @@ class ServerService:
     def __init__(self, server_dao:ServerDAO):
         self.__server_dao = server_dao
 
-    def createServer(self, servername, serverpassword, serverip, serverport):
+    def createServer(self, servername, serverpassword, serverip, serverport, avatarname, userid):
         serverid = str(uuid.uuid4())
-        if self.__server_dao.insertNewserver(serverid, servername, serverpassword, serverip, serverport):
+        avatarurl = 'http://127.0.0.1:5000/static/img/' + avatarname
+        if self.__server_dao.insertNewserver(serverid, servername, serverpassword, serverip, serverport, avatarurl):
+            self.joinServer(userid, serverid, serverpassword)
             return {'message': 'Create server successfully.'}, 200
         else:
             return {'message': 'Create server failed, try again later.'}, 400
@@ -37,7 +39,8 @@ class ServerService:
                         'serverid': data[0],
                         'servername': data[1],
                         'serverip': data[3],
-                        'serverport': data[4]
+                        'serverport': data[4],
+                        'avatarurl': data[5]
                     })
             return {
                 'message': 'Get server list successfully.',
@@ -58,7 +61,8 @@ class ServerService:
                     'serverid': data[0],
                     'servername': data[1],
                     'serverip': data[3],
-                    'serverport': data[4]
+                    'serverport': data[4],
+                    'avatarurl': data[5]
                 }
             }, 200
         else:
@@ -114,3 +118,18 @@ class ServerService:
         else:
             return {'message': 'Del channel failed, try again later.'}, 400
         
+
+    def saveAvatar(self, file_obj, file_name):
+        import os
+        try:
+            parent_parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            save_path = os.path.join(parent_parent_dir, 'static', 'img', file_name)
+            file_obj.save(save_path)
+            return {
+                'message': 'Save avatar successfully.'
+            }, 200
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return {
+                'message': 'Save avatar failed.'
+            }, 400
