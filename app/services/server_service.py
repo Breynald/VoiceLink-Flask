@@ -8,6 +8,9 @@ class ServerService:
     def createServer(self, servername, serverpassword, serverip, serverport, avatarname, userid):
         serverid = str(uuid.uuid4())
         avatarurl = 'http://127.0.0.1:5000/static/img/' + avatarname
+        if not self.__server_dao.setAdmin(userid, serverid):
+            return {'message': 'Create server failed, try again later.'}, 400
+
         if self.__server_dao.insertNewserver(serverid, servername, serverpassword, serverip, serverport, avatarurl):
             self.joinServer(userid, serverid, serverpassword)
             return {'message': 'Create server successfully.'}, 200
@@ -158,3 +161,15 @@ class ServerService:
             return {
                 'message': 'Search no server.'
             }, 404
+        
+
+    def checkPermission(self, userid, serverid):
+        admin = self.__server_dao.getAdmin(userid, serverid)
+        if admin is not None and len(admin)>0:
+            return {
+                'permission': True
+            }, 200
+        else:
+            return {
+                'permission': False
+            }, 200

@@ -175,3 +175,29 @@ class ServerDAO:
             return None
         finally:
             conn.close() 
+
+    def setAdmin(self, userid, serverid):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('INSERT INTO server_admin (userid, serverid) VALUES (%s, %s);', (userid, serverid))
+                return True
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            conn.rollback()
+            return False
+        finally:
+            conn.close()
+
+
+    def getAdmin(self, userid, serverid):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT * FROM server_admin WHERE userid=%s AND serverid=%s;', (userid, serverid))
+                return cur.fetchone()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+        finally:
+            conn.close() 

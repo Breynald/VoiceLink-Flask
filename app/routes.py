@@ -89,6 +89,11 @@ def searchserver():
     response, status_code = server_service.searchServer(data['servername'])
     return response, status_code
 
+@app.route('/api/checkpermission', methods=['POST'])
+def checkpermission():
+    data = request.json
+    response, status_code = server_service.checkPermission(data['userid'], data['serverid'])
+    return response, status_code
 
 
 @socketio.on('joinchannel')
