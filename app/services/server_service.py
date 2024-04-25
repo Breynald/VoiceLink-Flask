@@ -15,6 +15,10 @@ class ServerService:
             return {'message': 'Create server failed, try again later.'}, 400
     
     def joinServer(self, userid, serverid, serverpassword):
+        userinserver = self.__server_dao.checkUserinServer(userid, serverid)
+        if userinserver is not None and len(userinserver) > 0:
+            return { 'message': 'Already in this server.' }, 400
+
         if self.__server_dao.checkServerPublic(serverid):
             if self.__server_dao.addUsertoserver(userid, serverid):
                 return { 'message': 'Join server successfully.'}, 200
@@ -133,3 +137,24 @@ class ServerService:
             return {
                 'message': 'Save avatar failed.'
             }, 400
+        
+
+    def searchServer(self, servername):
+        datas = self.__server_dao.searchServer(servername)
+        if len(datas)>0:
+            serverlist = []
+            for data in datas:
+                serverlist.append({
+                    'serverid': data[0],
+                    'servername': data[1],
+                    'serverpassword': data[2],
+                    'avatarurl': data[5]
+                })
+            return {
+                'message': 'Search server successfully.',
+                'serverlist': serverlist
+            }, 200
+        else:
+            return {
+                'message': 'Search no server.'
+            }, 404

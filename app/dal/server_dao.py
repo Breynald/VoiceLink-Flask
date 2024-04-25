@@ -149,3 +149,29 @@ class ServerDAO:
         finally:
             conn.close() 
         
+
+    def searchServer(self, servername):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT * FROM server_data WHERE servername LIKE %s OR servername LIKE %s OR servername LIKE %s OR servername LIKE %s;',
+                            (servername, '%'+servername, servername+'%', '%'+servername+'%'))
+                return cur.fetchall()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+        finally:
+            conn.close() 
+
+    
+    def checkUserinServer(self, userid, serverid):
+        try:
+            conn = self.__pool.connection()
+            with conn.cursor() as cur:
+                cur.execute('SELECT * FROM user_server WHERE userid=%s AND serverid=%s;', (userid, serverid))
+                return cur.fetchone()
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return None
+        finally:
+            conn.close() 

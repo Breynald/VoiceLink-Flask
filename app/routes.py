@@ -83,6 +83,12 @@ def saveavatar():
     response, status_code = server_service.saveAvatar(file_obj, file_name)
     return response, status_code
 
+@app.route('/api/searchserver', methods=['POST'])
+def searchserver():
+    data = request.json
+    response, status_code = server_service.searchServer(data['servername'])
+    return response, status_code
+
 
 
 @socketio.on('joinchannel')
